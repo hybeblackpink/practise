@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="97512e41-c283-48d7-bbe6-eedb22f92f7f" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="7ecdfbe2-5567-4cb5-aa21-546cad914290" >
+		<file:connection workingDir="D:\input" />
+	</file:config>
+	<flow name="foreachFlow" doc:id="e268b389-12e8-4961-bf2b-ca5050b06198" >
+		<file:listener doc:name="On New or Updated File" doc:id="89e60b77-143e-4fcb-b17e-4daa2ff12c1f" config-ref="File_Config" moveToDirectory="D:\output">
+			<scheduling-strategy >
+				<fixed-frequency frequency="10" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</file:listener>
+		<foreach doc:name="For Each" doc:id="41762c8f-7e24-4681-a8d3-c0cd9478685b" >
+			<logger level="INFO" doc:name="Logger" doc:id="b53d53fe-0f56-4828-8645-b9a6cc329392" message="#[payload]"/>
+		</foreach>
+		<logger level="INFO" doc:name="Logger" doc:id="8aec03ff-a672-4d11-9d15-dc69d954643d" message="#[payload]"/>
+	</flow>
+	<flow name="foreachFlow1" doc:id="c7ef3cdb-31b4-4d07-aa6e-2c4fe2f2f7f6" >
+		<http:listener doc:name="Listener" doc:id="e77b924d-6c73-4d0e-81b8-4145df04c4f5" config-ref="HTTP_Listener_config" path="/each"/>
+		<set-variable value="0" doc:name="Set Variable" doc:id="0e552f40-8b36-49dd-af07-28d9dc0e253e" variableName="sum"/>
+		<foreach doc:name="For Each" doc:id="aa789fc0-1c70-42a2-9add-c983c920a3b9" collection="[1,8,4,9,3]">
+			<ee:transform doc:name="Transform Message" doc:id="67ae2c73-b3c1-46d1-90b0-251a27e6a227" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="sum" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.sum + payload]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</foreach>
+		<logger level="INFO" doc:name="Logger" doc:id="382fad57-fec2-44b4-ba86-14f2b0301218" message="#[vars.sum]"/>
+	</flow>
+</mule>
