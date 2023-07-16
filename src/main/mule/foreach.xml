@@ -39,5 +39,6 @@ vars.sum + payload]]></ee:set-variable>
 			</ee:transform>
 		</foreach>
 		<logger level="INFO" doc:name="Logger" doc:id="382fad57-fec2-44b4-ba86-14f2b0301218" message="#[vars.sum]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="92f8b3aa-7ec0-489e-9f4c-7542c4555298" message="end"/>
 	</flow>
 </mule>
